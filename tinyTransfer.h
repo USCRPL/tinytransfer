@@ -17,8 +17,8 @@
 #include <cstdint>
 
 extern "C" {
-    #include "heatshrink_encoder.h"
-    #include "heatshrink_decoder.h"
+    #include "heatshrink/heatshrink_encoder.h"
+    #include "heatshrink/heatshrink_decoder.h"
 }
 
 /**
