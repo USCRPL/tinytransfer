@@ -6,7 +6,7 @@
 #include "tinyTransfer.h"
 
 extern "C" {
-    #include "heatshrink/heatshrink_encoder.h"
+    #include "heatshrink_encoder.h"
 }
 
 /** Static compression encoder and decoder */
