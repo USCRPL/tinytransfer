@@ -29,6 +29,8 @@ extern "C" {
 /** Checksum algorithm fletcher-16, produces a 2 byte checksum */
 uint16_t fletcher16(const uint8_t* data, uint64_t length);
 
+extern "C" int test(int x); // testing python bindings
+
 /** Tiny Transfer Update Packet Structure
 Header:
     0x00:   0x4D 0x44 0x4C 0x4E     // Start of Header (SOH)

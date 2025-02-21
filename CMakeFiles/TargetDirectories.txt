@@ -1,0 +1,4 @@
+/Users/nellimikayelyan/Documents/GitHub/tinytransfer/CMakeFiles/heatshrink.dir
+/Users/nellimikayelyan/Documents/GitHub/tinytransfer/CMakeFiles/tinytransfer.dir
+/Users/nellimikayelyan/Documents/GitHub/tinytransfer/CMakeFiles/edit_cache.dir
+/Users/nellimikayelyan/Documents/GitHub/tinytransfer/CMakeFiles/rebuild_cache.dir

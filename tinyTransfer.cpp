@@ -98,7 +98,6 @@ uint16_t TinyTransferUpdatePacket::TinyTransferUpdatePacket::serialize(uint8_t* 
     return sizeof(header) + sizeof(headerChecksum) + payloadSize + logSize;
 }
 
-
 TinyTransferUpdateParser::TinyTransferUpdateParser() {
     init();
 }
@@ -167,7 +166,6 @@ bool TinyTransferUpdateParser::processByte(uint8_t byte){
     }
     return false;
 }
-
 
 TinyTransferRPCPacket::TinyTransferRPCPacket() {
 
@@ -255,4 +253,10 @@ bool TinyTransferRPCParser::processByte(uint8_t byte){
         position++;
     }
     return false;
+}
+
+
+// testing python bindings 
+extern "C" int test(int x){
+    return x*x;
 }

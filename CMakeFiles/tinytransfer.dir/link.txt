@@ -1,0 +1,1 @@
+/Library/Developer/CommandLineTools/usr/bin/c++  -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.2.sdk -mmacosx-version-min=15.1 -dynamiclib -Wl,-headerpad_max_install_names -o libtinytransfer.dylib -install_name @rpath/libtinytransfer.dylib CMakeFiles/tinytransfer.dir/tinytransfer.cpp.o  libheatshrink.a
