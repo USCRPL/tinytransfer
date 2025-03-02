@@ -274,6 +274,11 @@ PYBIND11_MODULE(tinytransfer_py, handle){
     py::class_<TinyTransferUpdateParser>(handle, "TinyTransferUpdateParser")
     .def(py::init<>())
     .def("init", &TinyTransferUpdateParser::init)
-    .def("processByte", &TinyTransferUpdateParser::processByte, py::arg("byte"));
+    .def("processByte", &TinyTransferUpdateParser::processByte);
+
+    py::class_<TinyTransferRPCParser>(handle, "TinyTransferRPCParser")
+    .def(py::init<>())
+    .def("init", &TinyTransferRPCParser::init)
+    .def("processByte", &TinyTransferRPCParser::processByte);
 
 }
