@@ -1,3 +1,7 @@
 [submodule "heatshrink"]
-	path = heatshrink
+	path = submodules/heatshrink
 	url = https://github.com/atomicobject/heatshrink
+
+[submodule "pybind11"]
+	path = submodules/pybind11
+	url = https://github.com/pybind/pybind11
