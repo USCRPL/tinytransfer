@@ -258,12 +258,22 @@ bool TinyTransferRPCParser::processByte(uint8_t byte){
 }
 
 
-// testing python bindings 
-extern "C" int test(int x){
-    return x*x;
-}
+PYBIND11_MODULE(tinytransfer_py, handle){
+    handle.doc() = "python bindings for tiny transfer";
 
-PYBIND11_MODULE(cooked, handle){
-    handle.doc() = "testing pybind";
-    handle.def("test_me", &testMe);
+    py::class_<TinyTransferUpdatePacket>(handle, "TinyTransferUpdatePacket")
+    .def(py::init<>())
+    .def(py::init<uint8_t*, uint16_t, uint32_t, char*, uint16_t, bool, bool>(), "constructor full", py::arg("payload"), py::arg("payloadSize"),py::arg("packetId"),py::arg("log"),py::arg("logSize"),py::arg("compressed"),py::arg("isIntegrator"))
+    .def("serialize", &TinyTransferUpdatePacket::serialize);
+
+    py::class_<TinyTransferRPCPacket>(handle, "TinyTransferRPCPacket")
+    .def(py::init<>())
+    .def(py::init<uint8_t*>(), "constructor full", py::arg("_data"))
+    .def("isValid", &TinyTransferRPCPacket::isValid);
+
+    py::class_<TinyTransferUpdateParser>(handle, "TinyTransferUpdateParser")
+    .def(py::init<>())
+    .def("init", &TinyTransferUpdateParser::init)
+    .def("processByte", &TinyTransferUpdateParser::processByte, py::arg("byte"));
+
 }

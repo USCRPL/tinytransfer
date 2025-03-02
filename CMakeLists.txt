@@ -9,21 +9,28 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
 
-# # made folder structure neat 
+# made folder structure neat 
 set(MODULE_SOURCE "${PROJECT_SOURCE_DIR}/src")
-set(SUBMOBULES_SOURCE "${PROJECT_SOURCE_DIR}/submodules")
+set(SUBMODULES_SOURCE "${PROJECT_SOURCE_DIR}/submodules")
 
-add_library(heatshrink STATIC ${SUBMOBULES_SOURCE}/heatshrink/heatshrink_encoder.c ${SUBMOBULES_SOURCE}/heatshrink/heatshrink_decoder.c)
-add_library(tinytransfer ${MODULE_SOURCE}/tinytransfer.cpp)
+# For pythin bindings
+add_subdirectory(${SUBMODULES_SOURCE}/pybind11)
 
-# For pythin bindings --
-add_subdirectory(${SUBMOBULES_SOURCE}/pybind11)
-pybind11_add_module(cooked ${MODULE_SOURCE}/test.cpp)
-# --
-
-target_include_directories(heatshrink PUBLIC ${SUBMOBULES_SOURCE}/heatshrink)
-target_include_directories(tinytransfer PUBLIC ${MODULE_SOURCE})
-
+add_library(heatshrink  
+    ${SUBMODULES_SOURCE}/heatshrink/heatshrink_encoder.c 
+    ${SUBMODULES_SOURCE}/heatshrink/heatshrink_decoder.c
+)
+target_include_directories(heatshrink PUBLIC ${SUBMODULES_SOURCE}/heatshrink)
 target_compile_options(heatshrink PRIVATE -Wno-unknown-pragmas)
 
-target_link_libraries(tinytransfer heatshrink )
+add_library(tinytransfer ${MODULE_SOURCE}/tinyTransfer.cpp)
+target_include_directories(tinytransfer PUBLIC ${MODULE_SOURCE})
+target_link_libraries(tinytransfer PUBLIC heatshrink pybind11::pybind11)
+
+# For pythin bindings
+pybind11_add_module(tinytransfer_py ${MODULE_SOURCE}/tinyTransfer.cpp)
+target_include_directories(tinytransfer_py PRIVATE ${MODULE_SOURCE})
+target_link_libraries(tinytransfer_py PRIVATE tinytransfer)
+
+
+
