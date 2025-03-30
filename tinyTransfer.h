@@ -75,6 +75,10 @@ struct TinyTransferUpdatePacket {
         };
 
         uint16_t serialize(uint8_t* output);
+
+        bool isCompressed();
+
+        uint16_t decompressPayload(uint8_t* output);
 };
 
 /** Tiny Transfer RPC Packet Structure

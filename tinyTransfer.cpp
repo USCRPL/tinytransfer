@@ -12,6 +12,7 @@ extern "C" {
 
 /** Static compression encoder and decoder */
 static heatshrink_encoder hs_encoder;
+static heatshrink_decoder hs_decoder;
 
 uint16_t fletcher16(const uint8_t* data, uint64_t length){
     uint32_t c0, c1;
@@ -99,6 +100,48 @@ uint16_t TinyTransferUpdatePacket::TinyTransferUpdatePacket::serialize(uint8_t* 
     return sizeof(header) + sizeof(headerChecksum) + payloadSize + logSize;
 }
 
+bool TinyTransferUpdatePacket::isCompressed() {
+    return packetFlags & TINY_TRANSFER_UPDATE_FLAGS_COMPRESSED;
+}
+
+uint16_t TinyTransferUpdatePacket::decompressPayload(uint8_t* output) {
+    if (isCompressed()) {
+        size_t input_index = 0, output_index = 0;
+        size_t input_size = 0, output_size = 0;
+        HSD_poll_res poll_res;
+        HSD_finish_res finish_res;
+
+        heatshrink_decoder_reset(&hs_decoder);
+
+        while (input_index < payloadSize) {
+            heatshrink_decoder_sink(&hs_decoder, &payload[input_index], payloadSize - input_index, &input_size);
+            input_index += input_size;
+
+            do {
+                poll_res = heatshrink_decoder_poll(&hs_decoder, &output[output_index], sizeof(payload) - output_index, &output_size);
+                output_index += output_size;
+
+            } while (poll_res == HSDR_POLL_MORE && output_index < payloadSize);
+        }
+
+        finish_res = heatshrink_decoder_finish(&hs_decoder);
+
+        while (finish_res == HSDR_FINISH_MORE) {
+            finish_res = heatshrink_decoder_finish(&hs_decoder);
+            do {
+                poll_res = heatshrink_decoder_poll(&hs_decoder, &output[output_index], sizeof(payload) - output_index, &output_size);
+                output_index += output_size;
+            } while (poll_res == HSDR_POLL_MORE);
+        }
+
+        return output_index;
+    }
+    else {
+        memcpy(output, payload, payloadSize);
+        return payloadSize;
+    }
+}
+
 
 TinyTransferUpdateParser::TinyTransferUpdateParser() {
     init();
@@ -150,7 +193,6 @@ bool TinyTransferUpdateParser::processByte(uint8_t byte){
                 position = 0;
             }
             else {
-                printf("header checksum failed!\n");
                 init();
             }
         }
@@ -169,7 +211,6 @@ bool TinyTransferUpdateParser::processByte(uint8_t byte){
     }
     return false;
 }
-
 
 TinyTransferRPCPacket::TinyTransferRPCPacket() {
 
