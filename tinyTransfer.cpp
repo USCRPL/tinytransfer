@@ -2,6 +2,7 @@
 // Created by dylan on 8/12/23.
 //
 #include <cstring>
+#include <iostream>
 
 #include "tinyTransfer.h"
 
@@ -137,7 +138,7 @@ bool TinyTransferUpdateParser::processByte(uint8_t byte){
         ((uint8_t*)(&inputPacket.headerChecksum))[position] = byte;
         position++;
         if(position == sizeof(inputPacket.headerChecksum)){
-            uint16_t redo_checksum = fletcher16(inputPacket.header, sizeof(TinyTransferRPCPacket::header));
+            uint16_t redo_checksum = fletcher16(inputPacket.header, sizeof(TinyTransferUpdatePacket::header));
 
             if(redo_checksum == inputPacket.headerChecksum){
                 if (inputPacket.payloadSize == 0) {
@@ -149,6 +150,7 @@ bool TinyTransferUpdateParser::processByte(uint8_t byte){
                 position = 0;
             }
             else {
+                printf("header checksum failed!\n");
                 init();
             }
         }
