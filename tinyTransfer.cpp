@@ -212,10 +212,6 @@ bool TinyTransferUpdateParser::processByte(uint8_t byte){
     return false;
 }
 
-TinyTransferRPCPacket::TinyTransferRPCPacket() {
-
-}
-
 TinyTransferRPCPacket::TinyTransferRPCPacket(uint8_t* _data) {
     memcpy(header, _data, sizeof(header));
     memcpy(&headerChecksum, _data + sizeof(header), sizeof(headerChecksum));

@@ -61,11 +61,12 @@ struct TinyTransferUpdatePacket {
         };
 
         uint16_t headerChecksum;
-        uint8_t payload[TINY_TRANSFER_UPDATE_MAX_PAYLOAD_LENGTH];
-        uint8_t log[TINY_TRANSFER_UPDATE_MAX_LOG_LENGTH];
+        uint8_t payload[TINY_TRANSFER_UPDATE_MAX_PAYLOAD_LENGTH] = {0};
+        uint8_t log[TINY_TRANSFER_UPDATE_MAX_LOG_LENGTH] = {0};
 
         TinyTransferUpdatePacket(uint8_t* payload, uint16_t payloadSize, uint32_t packetId, char* log = NULL, uint16_t logSize = 0, bool compressed = true, bool isIntegrator = false);
-        TinyTransferUpdatePacket(){
+
+        TinyTransferUpdatePacket() {
             packetId = 0;
             packetFlags = 0;
             payloadSize = 0;
@@ -112,11 +113,17 @@ struct TinyTransferRPCPacket {
         };
 
         uint16_t headerChecksum;
-        uint8_t args[TINY_TRANSFER_RPC_MAX_ARGS_SIZE];
-
-        TinyTransferRPCPacket();
+        uint8_t args[TINY_TRANSFER_RPC_MAX_ARGS_SIZE] = {0};
 
         TinyTransferRPCPacket(uint8_t* _data); // deserealize
+
+        TinyTransferRPCPacket() {
+            packetNonce = 0;
+            procId = 0;
+            procArgsLength = 0;
+            procArgsChecksum = 0;
+            headerChecksum = 0;
+        };
 
         bool isValid();
     
