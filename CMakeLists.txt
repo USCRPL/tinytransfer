@@ -18,6 +18,8 @@ add_library(tinytransfer ${CMAKE_CURRENT_SOURCE_DIR}/tinytransfer.cpp)
 target_include_directories(heatshrink PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/heatshrink)
 target_include_directories(tinytransfer PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
-target_compile_options(heatshrink PRIVATE -Wno-unknown-pragmas)
+if(NOT TINYTRANSFER_X86)
+    target_compile_options(heatshrink PRIVATE -Wno-unknown-pragmas)
+endif()
 
 target_link_libraries(tinytransfer heatshrink)

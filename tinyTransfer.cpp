@@ -6,14 +6,6 @@
 
 #include "tinyTransfer.h"
 
-extern "C" {
-    #include "heatshrink_encoder.h"
-}
-
-/** Static compression encoder and decoder */
-static heatshrink_encoder hs_encoder;
-static heatshrink_decoder hs_decoder;
-
 uint16_t fletcher16(const uint8_t* data, uint64_t length){
     uint32_t c0, c1;
 
@@ -35,15 +27,13 @@ uint16_t fletcher16(const uint8_t* data, uint64_t length){
     return (c1 << 8 | c0);
 }
 
-TinyTransferUpdatePacket::TinyTransferUpdatePacket(uint8_t* _data, uint16_t _length, uint32_t _packetId, char* _log, uint16_t _logSize, bool compressed, bool isIntegrator) {
-    packetFlags = 0;
-    
+TinyTransferUpdatePacket::TinyTransferUpdatePacket(uint8_t* _data, uint16_t _length, uint32_t _packetId, char* _log, uint16_t _logSize, bool compressed, bool isIntegrator) : TinyTransferUpdatePacket() {
     if (compressed) {
         heatshrink_encoder_reset(&hs_encoder);
 
         size_t count = 0;
-        uint32_t sunk = 0;
-        uint32_t polled = 0;
+        size_t sunk = 0;
+        size_t polled = 0;
 
         while (sunk < _length) {
             heatshrink_encoder_sink(&hs_encoder, &_data[sunk], _length - sunk, &count);
@@ -64,7 +54,7 @@ TinyTransferUpdatePacket::TinyTransferUpdatePacket(uint8_t* _data, uint16_t _len
             }
         }
 
-        payloadSize = polled;
+        payloadSize = (uint16_t)polled;
         packetFlags |= TINY_TRANSFER_UPDATE_FLAGS_COMPRESSED;
     }
     else {
@@ -134,7 +124,7 @@ uint16_t TinyTransferUpdatePacket::decompressPayload(uint8_t* output) {
             } while (poll_res == HSDR_POLL_MORE);
         }
 
-        return output_index;
+        return (uint16_t)output_index;
     }
     else {
         memcpy(output, payload, payloadSize);
@@ -212,7 +202,7 @@ bool TinyTransferUpdateParser::processByte(uint8_t byte){
     return false;
 }
 
-TinyTransferRPCPacket::TinyTransferRPCPacket(uint8_t* _data) {
+TinyTransferRPCPacket::TinyTransferRPCPacket(uint8_t* _data) : TinyTransferRPCPacket() {
     memcpy(header, _data, sizeof(header));
     memcpy(&headerChecksum, _data + sizeof(header), sizeof(headerChecksum));
     uint16_t copyLength = procArgsLength > TINY_TRANSFER_RPC_MAX_ARGS_SIZE ? TINY_TRANSFER_RPC_MAX_ARGS_SIZE : procArgsLength;

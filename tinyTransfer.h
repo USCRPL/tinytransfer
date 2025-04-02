@@ -21,6 +21,9 @@ extern "C" {
     #include "heatshrink_decoder.h"
 }
 
+static heatshrink_encoder hs_encoder;
+static heatshrink_decoder hs_decoder;
+
 /**
  * This is a file for packaging data into packets for transfer over radio / written into FlashLog
  * This will grab a serialized data, adding headers and checksums to it
@@ -47,7 +50,7 @@ struct TinyTransferUpdatePacket {
     public:
         union {
             struct {
-                uint32_t startOfHeader = TINY_TRANSFER_UPDATE_SOH;
+                uint32_t startOfHeader;
                 uint32_t packetId;
                 uint16_t packetFlags;
                 uint16_t payloadSize;
@@ -67,6 +70,7 @@ struct TinyTransferUpdatePacket {
         TinyTransferUpdatePacket(uint8_t* payload, uint16_t payloadSize, uint32_t packetId, char* log = NULL, uint16_t logSize = 0, bool compressed = true, bool isIntegrator = false);
 
         TinyTransferUpdatePacket() {
+            startOfHeader = TINY_TRANSFER_UPDATE_SOH;
             packetId = 0;
             packetFlags = 0;
             payloadSize = 0;
@@ -100,7 +104,7 @@ struct TinyTransferRPCPacket {
     public:
         union {
             struct {
-                uint32_t startOfHeader = TINY_TRANSFER_RPC_SOH;
+                uint32_t startOfHeader;
                 uint32_t packetNonce;
                 uint16_t procId;
                 uint16_t procArgsLength;
@@ -118,6 +122,7 @@ struct TinyTransferRPCPacket {
         TinyTransferRPCPacket(uint8_t* _data); // deserealize
 
         TinyTransferRPCPacket() {
+            startOfHeader = TINY_TRANSFER_RPC_SOH;
             packetNonce = 0;
             procId = 0;
             procArgsLength = 0;
