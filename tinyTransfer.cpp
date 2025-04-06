@@ -111,13 +111,15 @@ TinyTransferUpdatePacket::TinyTransferUpdatePacket(uint8_t* _data, uint16_t _len
     headerChecksum = fletcher16(header, sizeof(header));
 }
 
-/**
- * Output object data into packet format
- * @param output Input array to be filled with packet data
- * @return Size of packet
- */
-uint16_t TinyTransferUpdatePacket::serialize(uint8_t* output) {
-    //Header
+bool TinyTransferUpdatePacket::isValid() {
+    bool sohCheck = startOfHeader == TINY_TRANSFER_UPDATE_SOH;
+    bool headerPass = fletcher16(header, sizeof(header)) == headerChecksum;
+    bool argsPass = fletcher16(payload, payloadSize) == payloadChecksum && payloadSize <= TINY_TRANSFER_UPDATE_MAX_PAYLOAD_LENGTH;
+
+    return sohCheck && headerPass && argsPass;
+}
+
+uint16_t TinyTransferUpdatePacket::TinyTransferUpdatePacket::serialize(uint8_t* output) {
     memcpy(output, header, sizeof(header));
     //Header checksum
     memcpy(output + sizeof(header), &headerChecksum, sizeof(headerChecksum));
