@@ -29,7 +29,12 @@ static heatshrink_decoder hs_decoder;
  * This will grab a serialized data, adding headers and checksums to it
  */
 
-/** Checksum algorithm fletcher-16, produces a 2 byte checksum */
+ 
+/**
+ * Checksum algorithm fletcher-16, produces a 2 byte checksum 
+ * @param data Data to be made into a checksum
+ * @param length Length of input data
+ */
 uint16_t fletcher16(const uint8_t* data, uint64_t length);
 
 /** Tiny Transfer Update Packet Structure
@@ -67,6 +72,17 @@ struct TinyTransferUpdatePacket {
         uint8_t payload[TINY_TRANSFER_UPDATE_MAX_PAYLOAD_LENGTH] = {0};
         uint8_t log[TINY_TRANSFER_UPDATE_MAX_LOG_LENGTH] = {0};
 
+
+        /** 
+         * Initializes a TinyTransferUpdatePacket object
+         * @param _data Payload to be put into a packet
+         * @param _length Length of input payload
+         * @param _packetId Unique id of packet
+         * @param _log Data log to be put into object log
+         * @param _logSize Size of input data log
+         * @param compressed Whether or not the data is to be compressed
+         * @param isIntegrator Whether the data is from the integrator
+         */
         TinyTransferUpdatePacket(uint8_t* payload, uint16_t payloadSize, uint32_t packetId, char* log = NULL, uint16_t logSize = 0, bool compressed = true, bool isIntegrator = false);
 
         TinyTransferUpdatePacket() {
@@ -79,12 +95,30 @@ struct TinyTransferUpdatePacket {
             logSize = 0;
         };
 
+        /**
+         * Checks validity of update packet
+         * @return Whether a packet is a valid TinyTransferUpdatePacket
+         */
         bool isValid();
 
+        /**
+         * Packages data into packet structure to be sent
+         * @param output Input array to receive data in packet format
+         * @return size of packet
+         */
         uint16_t serialize(uint8_t* output);
 
+        /**
+         * Check if packet is compressed
+         * @return Packet compressed
+         */
         bool isCompressed();
 
+        /**
+         * Decompress given data into output
+         * @param output Input array to be given decompressed data
+         * @return Size of decompressed data
+         */
         uint16_t decompressPayload(uint8_t* output);
 };
 
@@ -121,7 +155,11 @@ struct TinyTransferRPCPacket {
         uint16_t headerChecksum;
         uint8_t args[TINY_TRANSFER_RPC_MAX_ARGS_SIZE] = {0};
 
-        TinyTransferRPCPacket(uint8_t* _data); // deserealize
+        /**
+         * Initialize RPC packet object, responsible for executing hamster functions remotely (MAEVA)
+         * @param _data Payload to be made into an RPC packet
+         */
+        TinyTransferRPCPacket(uint8_t* _data);
 
         TinyTransferRPCPacket() {
             startOfHeader = TINY_TRANSFER_RPC_SOH;
@@ -132,6 +170,10 @@ struct TinyTransferRPCPacket {
             headerChecksum = 0;
         };
 
+        /**
+         * Check validity of RPC packet
+         * @return Whether RPC packet is valid
+         */
         bool isValid();
 };
 
@@ -141,20 +183,41 @@ struct TinyTransferRPCPacket {
 #define TINY_TRANSFER_PARSER_PAYLOAD 3
 
 struct TinyTransferUpdateParser {
+    public:
+    /**
+     * Initialize Update Parser object
+     */
     TinyTransferUpdateParser();
-    void init();
+    /**
+     * Add a byte to update parser processing
+     * @param byte Input byte to be processed
+     * @return Whether or not a valid packet was found
+     */
     bool processByte(uint8_t);
-
+    
     int state;  
     uint32_t soh;
     TinyTransferUpdatePacket inputPacket;
     TinyTransferUpdatePacket completedPacket;
     size_t position;
+
+    private:
+    void init();
 };
 
 struct TinyTransferRPCParser {
+    public:
+
+    /**
+     * Initialize RPC Parser object
+     */
     TinyTransferRPCParser();
-    void init();
+
+    /**
+     * Add a byte to RPC parser processing
+     * @param byte Input byte to be processed
+     * @return Whether or not a packet is a valid RPC packet
+     */
     bool processByte(uint8_t);
 
     int state;  
@@ -162,6 +225,10 @@ struct TinyTransferRPCParser {
     TinyTransferRPCPacket inputPacket;
     TinyTransferRPCPacket completedPacket;
     size_t position;
+
+    private:
+
+    void init();
 };
 
 

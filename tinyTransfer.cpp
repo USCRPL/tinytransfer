@@ -5,11 +5,7 @@
 #include <iostream>
 
 #include "tinyTransfer.h"
-/**
- * Fletcher16 checksum algorithm
- * @param data Data to be made into a checksum
- * @param length Length of input data
- */
+
 uint16_t fletcher16(const uint8_t* data, uint64_t length){
     uint32_t c0, c1;
 
@@ -30,17 +26,7 @@ uint16_t fletcher16(const uint8_t* data, uint64_t length){
     }
     return (c1 << 8 | c0);
 }
-/** 
- * Initializes a TinyTransferUpdatePacket object
- * @param _data Payload to be put into a packet
- * @param _length Length of input payload
- * @param _packetId Unique id of packet
- * @param _log Data log to be put into object log
- * @param _logSize Size of input data log
- * @param compressed Whether or not the data is to be compressed
- * @param isIntegrator Whether the data is from the integrator
- * @
- */
+
 TinyTransferUpdatePacket::TinyTransferUpdatePacket(uint8_t* _data, uint16_t _length, uint32_t _packetId, char* _log, uint16_t _logSize, bool compressed, bool isIntegrator) : TinyTransferUpdatePacket() {
     //Input data is compressed
     if (compressed) {
@@ -131,19 +117,10 @@ uint16_t TinyTransferUpdatePacket::TinyTransferUpdatePacket::serialize(uint8_t* 
     return sizeof(header) + sizeof(headerChecksum) + payloadSize + logSize;
 }
 
-/**
- * Check if packet is compressed
- * @return Packet compressed
- */
 bool TinyTransferUpdatePacket::isCompressed() {
     return packetFlags & TINY_TRANSFER_UPDATE_FLAGS_COMPRESSED;
 }
 
-/**
- * Decompress given data into output
- * @param output Input array to be given decompressed data
- * @return Size of decompressed data
- */
 uint16_t TinyTransferUpdatePacket::decompressPayload(uint8_t* output) {
     if (isCompressed()) {
         //Decompression initialization
@@ -188,16 +165,10 @@ uint16_t TinyTransferUpdatePacket::decompressPayload(uint8_t* output) {
     }
 }
 
-/**
- * Constructor for update parser
- */
 TinyTransferUpdateParser::TinyTransferUpdateParser() {
     init();
 }
 
-/**
- * Initialize update parser object
- */
 void TinyTransferUpdateParser::init(){
     completedPacket = inputPacket;
     
@@ -208,11 +179,6 @@ void TinyTransferUpdateParser::init(){
     position = 0;
 }
 
-/**
- * Add a byte to update parser processing
- * @param byte Input byte to be processed
- * @return Whether or not a valid packet was found
- */
 bool TinyTransferUpdateParser::processByte(uint8_t byte){
     //Searching for MDLN
     if(state == TINY_TRANSFER_PARSER_SEARCHING_FOR_SOH){
@@ -285,10 +251,6 @@ bool TinyTransferUpdateParser::processByte(uint8_t byte){
     return false;
 }
 
-/**
- * Initialize RPC packet object
- * @param _data
- */
 TinyTransferRPCPacket::TinyTransferRPCPacket(uint8_t* _data) : TinyTransferRPCPacket() {
     //Header
     memcpy(header, _data, sizeof(header));
@@ -313,6 +275,8 @@ TinyTransferRPCParser::TinyTransferRPCParser() {
 
 void TinyTransferRPCParser::init(){
     completedPacket = inputPacket;
+
+    //First state is looking for NMEI
     state = TINY_TRANSFER_PARSER_SEARCHING_FOR_SOH;
     soh = 0;
     inputPacket = TinyTransferRPCPacket();
@@ -320,10 +284,12 @@ void TinyTransferRPCParser::init(){
 }
 
 bool TinyTransferRPCParser::processByte(uint8_t byte){
+    //Searching for NMEI
     if(state == TINY_TRANSFER_PARSER_SEARCHING_FOR_SOH){
         soh = soh >> 8;
         soh |= (byte << 24);
-
+        
+        //NMEI found
         if(soh == TINY_TRANSFER_RPC_SOH){
             state = TINY_TRANSFER_PARSER_HEADER;
             memcpy(inputPacket.header, &soh, sizeof(soh));
@@ -331,16 +297,19 @@ bool TinyTransferRPCParser::processByte(uint8_t byte){
         }
     }
 
+    //Search for rest of header
     else if (state == TINY_TRANSFER_PARSER_HEADER){
         inputPacket.header[position] = byte;
         position++;
-
+        
+        //Reached the end of the header
         if(position >= sizeof(TinyTransferRPCPacket::header)){
             state = TINY_TRANSFER_PARSER_HEADER_CHECKSUM;
             position = 0;
         }
     }
 
+    //Validate header
     else if (state == TINY_TRANSFER_PARSER_HEADER_CHECKSUM){
         ((uint8_t*)(&inputPacket.headerChecksum))[position] = byte;
         position++;
@@ -362,12 +331,13 @@ bool TinyTransferRPCParser::processByte(uint8_t byte){
         }
     }
 
+    //Process payload
     else if (state == TINY_TRANSFER_PARSER_PAYLOAD) {
         inputPacket.args[position] = byte;
         position++;
 
+        //Reached the end of the payload
         if(position >= inputPacket.procArgsLength){
-            ///send packet or something or return true
             init();
             return true;
         }
