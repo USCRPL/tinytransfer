@@ -79,6 +79,8 @@ struct TinyTransferUpdatePacket {
             logSize = 0;
         };
 
+        bool isValid();
+
         uint16_t serialize(uint8_t* output);
 
         bool isCompressed();
@@ -131,7 +133,6 @@ struct TinyTransferRPCPacket {
         };
 
         bool isValid();
-    
 };
 
 #define TINY_TRANSFER_PARSER_SEARCHING_FOR_SOH 0
