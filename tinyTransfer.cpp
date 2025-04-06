@@ -190,6 +190,7 @@ bool TinyTransferUpdateParser::processByte(uint8_t byte){
 
     else if (state == TINY_TRANSFER_PARSER_PAYLOAD) {
         inputPacket.payload[position] = byte;
+        position++;
 
         if(position >= inputPacket.payloadSize){
             ///send packet or something or return true
@@ -197,7 +198,6 @@ bool TinyTransferUpdateParser::processByte(uint8_t byte){
             return true;
         }
 
-        position++;
     }
     return false;
 }
@@ -274,14 +274,13 @@ bool TinyTransferRPCParser::processByte(uint8_t byte){
 
     else if (state == TINY_TRANSFER_PARSER_PAYLOAD) {
         inputPacket.args[position] = byte;
-
+        position++;
+        
         if(position >= inputPacket.procArgsLength){
             ///send packet or something or return true
             init();
             return true;
         }
-
-        position++;
     }
     return false;
 }
