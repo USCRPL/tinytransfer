@@ -140,7 +140,7 @@ struct TinyTransferRPCPacket {
     public:
         union {
             struct {
-                uint32_t startOfHeader;
+                uint32_t startOfHeader; 
                 uint32_t packetNonce;
                 uint16_t procId;
                 uint16_t procArgsLength;
@@ -181,6 +181,7 @@ struct TinyTransferRPCPacket {
 #define TINY_TRANSFER_PARSER_HEADER 1
 #define TINY_TRANSFER_PARSER_HEADER_CHECKSUM 2
 #define TINY_TRANSFER_PARSER_PAYLOAD 3
+#define TINY_TRANSFER_PARSER_LOG 4
 
 struct TinyTransferUpdateParser {
     public:

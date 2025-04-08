@@ -200,6 +200,7 @@ bool TinyTransferUpdateParser::processByte(uint8_t byte){
 
     //Search for rest of header
     else if (state == TINY_TRANSFER_PARSER_HEADER){
+        //Input rest of header data into object members
         inputPacket.header[position] = byte;
         position++;
 
@@ -236,17 +237,37 @@ bool TinyTransferUpdateParser::processByte(uint8_t byte){
         }
     }
 
-    //
+    //Read payload
     else if (state == TINY_TRANSFER_PARSER_PAYLOAD) {
         //Input payload into parser packet & move to the next byte
         inputPacket.payload[position] = byte;
         position++;
 
-        //If reached the end of payload - valid
+        //If reached the end of payload
         if(position >= inputPacket.payloadSize){
+            //No log given, exit - valid
+            if(inputPacket.logSize == 0){
+                init();
+                return true;
+            }
+            else{
+                state = TINY_TRANSFER_PARSER_LOG;
+                position = 0;
+            }
+        }
+    }
+
+    //Reading log
+    else if (state == TINY_TRANSFER_PARSER_LOG){
+        inputPacket.log[position] = byte;
+        position++;
+        
+        //If finished reading log, exit
+        if(position >= inputPacket.logSize){
             init();
             return true;
         }
+
     }
     return false;
 }
