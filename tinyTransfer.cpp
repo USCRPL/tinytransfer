@@ -82,7 +82,7 @@ TinyTransferUpdatePacket::TinyTransferUpdatePacket(uint8_t* _data, uint16_t _len
         //Copy data into log
         memcpy(log, _log, _logSize);
         logSize = _logSize;
-    } else {
+    }else{
         logSize = 0;
     }
 
@@ -105,7 +105,7 @@ bool TinyTransferUpdatePacket::isValid() {
     return sohCheck && headerPass && argsPass;
 }
 
-uint16_t TinyTransferUpdatePacket::TinyTransferUpdatePacket::serialize(uint8_t* output) {
+uint16_t TinyTransferUpdatePacket::serialize(uint8_t* output) {
     memcpy(output, header, sizeof(header));
     //Header checksum
     memcpy(output + sizeof(header), &headerChecksum, sizeof(headerChecksum));
@@ -219,15 +219,19 @@ bool TinyTransferUpdateParser::processByte(uint8_t byte){
             
             //If checksum of header matches header checksum in the array
             if(redo_checksum == inputPacket.headerChecksum){
-                //Empty packet - still valid
-                if (inputPacket.payloadSize == 0) {
+                //Payload present - process it
+                if(inputPacket.payloadSize != 0){
+
+                    state = TINY_TRANSFER_PARSER_PAYLOAD;
+                    position = 0;
+                } //No payload but has log - skip to parse log
+                else if((inputPacket.logSize != 0)){
+                    state = TINY_TRANSFER_PARSER_LOG;
+                    position = 0;
+                }else{ //No log or payload - finish
                     init();
                     return true;
                 }
-
-                //Transition to payload parsing
-                state = TINY_TRANSFER_PARSER_PAYLOAD;
-                position = 0;
             }
 
             //invalid checksum, start over again
@@ -287,7 +291,8 @@ bool TinyTransferRPCPacket::isValid() {
     bool headerPass = fletcher16(header, sizeof(header)) == headerChecksum;
     bool argsPass = fletcher16(args, procArgsLength) == procArgsChecksum && procArgsLength <= TINY_TRANSFER_RPC_MAX_ARGS_SIZE;
 
-    return sohCheck && headerPass && argsPass;
+    //return sohCheck && headerPass && argsPass;
+    return headerPass;
 }
 
 TinyTransferRPCParser::TinyTransferRPCParser() {
