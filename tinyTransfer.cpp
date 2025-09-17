@@ -219,15 +219,23 @@ bool TinyTransferUpdateParser::processByte(uint8_t byte){
             
             //If checksum of header matches header checksum in the array
             if(redo_checksum == inputPacket.headerChecksum){
-                //Empty packet - still valid
-                if (inputPacket.payloadSize == 0) {
+                // Empty packet - still valid
+                if (inputPacket.payloadSize == 0 && inputPacket.logSize == 0) {
                     init();
                     return true;
                 }
 
-                //Transition to payload parsing
-                state = TINY_TRANSFER_PARSER_PAYLOAD;
-                position = 0;
+                else if (inputPacket.payloadSize == 0 && inputPacket.logSize > 0) {
+                    state = TINY_TRANSFER_PARSER_LOG; 
+                    position = 0;
+
+                }
+                else {
+                    // Transition to payload parsing 
+                    state = TINY_TRANSFER_PARSER_PAYLOAD;
+                    position = 0;
+                }
+
             }
 
             //invalid checksum, start over again
