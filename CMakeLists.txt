@@ -13,7 +13,7 @@ set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
 add_compile_definitions(HEATSHRINK_DYNAMIC_ALLOC=0)
 
 add_library(heatshrink ${CMAKE_CURRENT_SOURCE_DIR}/heatshrink/heatshrink_encoder.c ${CMAKE_CURRENT_SOURCE_DIR}/heatshrink/heatshrink_decoder.c)
-add_library(tinytransfer ${CMAKE_CURRENT_SOURCE_DIR}/tinytransfer.cpp)
+add_library(tinytransfer ${CMAKE_CURRENT_SOURCE_DIR}/tinyTransfer.cpp)
 
 target_include_directories(heatshrink PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/heatshrink)
 target_include_directories(tinytransfer PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
