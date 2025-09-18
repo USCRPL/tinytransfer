@@ -202,7 +202,6 @@ struct TinyTransferUpdateParser {
     TinyTransferUpdatePacket completedPacket;
     size_t position;
 
-    private:
     void init();
 };
 
@@ -226,8 +225,6 @@ struct TinyTransferRPCParser {
     TinyTransferRPCPacket inputPacket;
     TinyTransferRPCPacket completedPacket;
     size_t position;
-
-    private:
 
     void init();
 };
