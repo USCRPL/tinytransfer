@@ -100,9 +100,9 @@ TinyTransferUpdatePacket::TinyTransferUpdatePacket(uint8_t* _data, uint16_t _len
 bool TinyTransferUpdatePacket::isValid() {
     bool sohCheck = startOfHeader == TINY_TRANSFER_UPDATE_SOH;
     bool headerPass = fletcher16(header, sizeof(header)) == headerChecksum;
-    bool argsPass = fletcher16(payload, payloadSize) == payloadChecksum && payloadSize <= TINY_TRANSFER_UPDATE_MAX_PAYLOAD_LENGTH;
+    bool payloadPass = payloadSize == 0 || (fletcher16(payload, payloadSize) == payloadChecksum && payloadSize <= TINY_TRANSFER_UPDATE_MAX_PAYLOAD_LENGTH);
 
-    return sohCheck && headerPass && argsPass;
+    return sohCheck && headerPass && payloadPass;
 }
 
 uint16_t TinyTransferUpdatePacket::serialize(uint8_t* output) {
@@ -289,10 +289,9 @@ TinyTransferRPCPacket::TinyTransferRPCPacket(uint8_t* _data) : TinyTransferRPCPa
 bool TinyTransferRPCPacket::isValid() {
     bool sohCheck = startOfHeader == TINY_TRANSFER_RPC_SOH;
     bool headerPass = fletcher16(header, sizeof(header)) == headerChecksum;
-    bool argsPass = fletcher16(args, procArgsLength) == procArgsChecksum && procArgsLength <= TINY_TRANSFER_RPC_MAX_ARGS_SIZE;
+    bool argsPass = procArgsLength == 0 || (fletcher16(args, procArgsLength) == procArgsChecksum && procArgsLength <= TINY_TRANSFER_RPC_MAX_ARGS_SIZE);
 
-    //return sohCheck && headerPass && argsPass;
-    return headerPass;
+    return sohCheck && headerPass && argsPass;
 }
 
 TinyTransferRPCParser::TinyTransferRPCParser() {
