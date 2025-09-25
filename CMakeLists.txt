@@ -19,7 +19,7 @@ target_include_directories(heatshrink PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/heatshr
 target_include_directories(tinytransfer PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 if(NOT TINYTRANSFER_X86)
-    target_compile_options(heatshrink PRIVATE -Wno-unknown-pragmas)
+    target_compile_options(heatshrink PRIVATE -Wno-unknown-pragmas -Wno-unused-variable -Wno-implicit-fallthrough)
 endif()
 
 target_link_libraries(tinytransfer heatshrink)
