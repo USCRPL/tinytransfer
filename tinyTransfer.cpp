@@ -6,6 +6,15 @@
 
 #include "tinyTransfer.h"
 
+extern "C" {
+    #include "heatshrink_encoder.h"
+    #include "heatshrink_decoder.h"
+}
+
+static heatshrink_encoder hs_encoder;
+static heatshrink_decoder hs_decoder;
+
+
 uint16_t fletcher16(const uint8_t* data, uint64_t length){
     uint32_t c0, c1;
 

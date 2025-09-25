@@ -16,14 +16,6 @@
 #include <initializer_list>
 #include <cstdint>
 
-extern "C" {
-    #include "heatshrink_encoder.h"
-    #include "heatshrink_decoder.h"
-}
-
-static heatshrink_encoder hs_encoder;
-static heatshrink_decoder hs_decoder;
-
 /**
  * This is a file for packaging data into packets for transfer over radio / written into FlashLog
  * This will grab a serialized data, adding headers and checksums to it
