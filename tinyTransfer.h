@@ -1,9 +1,4 @@
-//
-// Created by dylan on 8/12/23.
-//
-
-#ifndef NEWHAMSTER_TINYTRANSFER_H
-#define NEWHAMSTER_TINYTRANSFER_H
+#pragma once
 
 #define TINY_TRANSFER_UPDATE_SOH                   0x4E4C444D
 #define TINY_TRANSFER_UPDATE_MAX_PAYLOAD_LENGTH    1024
@@ -220,6 +215,3 @@ struct TinyTransferRPCParser {
 
     void init();
 };
-
-
-#endif //NEWHAMSTER_TINYTRANSFER_H
