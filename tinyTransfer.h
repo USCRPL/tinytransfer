@@ -162,6 +162,13 @@ struct TinyTransferRPCPacket {
          * @return Whether RPC packet is valid
          */
         bool isValid();
+
+        /**
+         * Packages data into packet structure to be sent
+         * @param output Input array to receive data in packet format
+         * @return size of packet
+         */
+        uint16_t serialize(uint8_t* output);
 };
 
 #define TINY_TRANSFER_PARSER_SEARCHING_FOR_SOH 0
