@@ -300,6 +300,17 @@ bool TinyTransferRPCPacket::isValid() {
     return sohCheck && headerPass && argsPass;
 }
 
+uint16_t TinyTransferRPCPacket::serialize(uint8_t* output) {
+    //Header
+    memcpy(output, header, sizeof(header));
+    //Header checksum
+    memcpy(output + sizeof(header), &headerChecksum, sizeof(headerChecksum));
+    //Args
+    memcpy(output + sizeof(header) + sizeof(headerChecksum), args, procArgsLength);
+
+    return sizeof(header) + sizeof(headerChecksum) + procArgsLength;
+}
+
 TinyTransferRPCParser::TinyTransferRPCParser() {
     init();
 }
