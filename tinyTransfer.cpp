@@ -57,7 +57,7 @@ TinyTransferUpdatePacket::TinyTransferUpdatePacket(uint8_t* _data, uint16_t _len
             //Retrieve compressed data
             HSE_poll_res pres;
             do {
-                pres = heatshrink_encoder_poll(&hs_encoder, &payload[polled], sizeof(TinyTransferUpdatePacket) - polled, &count);
+                pres = heatshrink_encoder_poll(&hs_encoder, &payload[polled], TINY_TRANSFER_UPDATE_MAX_PAYLOAD_LENGTH - polled, &count);
                 polled += count;
             } while (pres == HSER_POLL_MORE);
 
@@ -145,10 +145,10 @@ uint16_t TinyTransferUpdatePacket::decompressPayload(uint8_t* output) {
 
             //Retrieve decompressed data
             do {
-                poll_res = heatshrink_decoder_poll(&hs_decoder, &output[output_index], sizeof(payload) - output_index, &output_size);
+                poll_res = heatshrink_decoder_poll(&hs_decoder, &output[output_index], TINY_TRANSFER_UPDATE_MAX_PAYLOAD_LENGTH - output_index, &output_size);
                 output_index += output_size;
 
-            } while (poll_res == HSDR_POLL_MORE && output_index < payloadSize);
+            } while (poll_res == HSDR_POLL_MORE);
         }
 
         finish_res = heatshrink_decoder_finish(&hs_decoder);
@@ -157,7 +157,7 @@ uint16_t TinyTransferUpdatePacket::decompressPayload(uint8_t* output) {
         while (finish_res == HSDR_FINISH_MORE) {
             finish_res = heatshrink_decoder_finish(&hs_decoder);
             do {
-                poll_res = heatshrink_decoder_poll(&hs_decoder, &output[output_index], sizeof(payload) - output_index, &output_size);
+                poll_res = heatshrink_decoder_poll(&hs_decoder, &output[output_index], TINY_TRANSFER_UPDATE_MAX_PAYLOAD_LENGTH - output_index, &output_size);
                 output_index += output_size;
             } while (poll_res == HSDR_POLL_MORE);
         }
