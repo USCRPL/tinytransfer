@@ -111,7 +111,12 @@ bool TinyTransferUpdatePacket::isValid() {
     return sohCheck && headerPass && payloadPass;
 }
 
-uint16_t TinyTransferUpdatePacket::serialize(uint8_t* output) {
+uint16_t TinyTransferUpdatePacket::serialize(uint8_t* output, size_t outputCapacity) {
+    const size_t serializedSize = sizeof(header) + sizeof(headerChecksum) + payloadSize + logSize;
+    if (output == nullptr || serializedSize > outputCapacity) {
+        return 0;
+    }
+
     memcpy(output, header, sizeof(header));
     //Header checksum
     memcpy(output + sizeof(header), &headerChecksum, sizeof(headerChecksum));
@@ -120,7 +125,7 @@ uint16_t TinyTransferUpdatePacket::serialize(uint8_t* output) {
     //Log
     memcpy(output + sizeof(header) + sizeof(headerChecksum) + payloadSize, log, logSize);
 
-    return sizeof(header) + sizeof(headerChecksum) + payloadSize + logSize;
+    return static_cast<uint16_t>(serializedSize);
 }
 
 bool TinyTransferUpdatePacket::isCompressed() {
@@ -225,6 +230,13 @@ bool TinyTransferUpdateParser::processByte(uint8_t byte){
             
             //If checksum of header matches header checksum in the array
             if(redo_checksum == inputPacket.headerChecksum){
+                // Discard packets that exceed the fixed payload or log buffers.
+                if (inputPacket.payloadSize > TINY_TRANSFER_UPDATE_MAX_PAYLOAD_LENGTH ||
+                    inputPacket.logSize > TINY_TRANSFER_UPDATE_MAX_LOG_LENGTH) {
+                    init();
+                    return false;
+                }
+
                 //Payload present - process it
                 if(inputPacket.payloadSize != 0){
 
@@ -300,7 +312,12 @@ bool TinyTransferRPCPacket::isValid() {
     return sohCheck && headerPass && argsPass;
 }
 
-uint16_t TinyTransferRPCPacket::serialize(uint8_t* output) {
+uint16_t TinyTransferRPCPacket::serialize(uint8_t* output, size_t outputCapacity) {
+    const size_t serializedSize = sizeof(header) + sizeof(headerChecksum) + procArgsLength;
+    if (output == nullptr || serializedSize > outputCapacity) {
+        return 0;
+    }
+
     //Header
     memcpy(output, header, sizeof(header));
     //Header checksum
@@ -308,7 +325,7 @@ uint16_t TinyTransferRPCPacket::serialize(uint8_t* output) {
     //Args
     memcpy(output + sizeof(header) + sizeof(headerChecksum), args, procArgsLength);
 
-    return sizeof(header) + sizeof(headerChecksum) + procArgsLength;
+    return static_cast<uint16_t>(serializedSize);
 }
 
 TinyTransferRPCParser::TinyTransferRPCParser() {

@@ -91,9 +91,10 @@ struct TinyTransferUpdatePacket {
         /**
          * Packages data into packet structure to be sent
          * @param output Input array to receive data in packet format
-         * @return size of packet
+         * @param outputCapacity Size of the output array in bytes
+         * @return Size of packet, or 0 if the packet cannot fit
          */
-        uint16_t serialize(uint8_t* output);
+        uint16_t serialize(uint8_t* output, size_t outputCapacity);
 
         /**
          * Check if packet is compressed
@@ -166,9 +167,10 @@ struct TinyTransferRPCPacket {
         /**
          * Packages data into packet structure to be sent
          * @param output Input array to receive data in packet format
-         * @return size of packet
+         * @param outputCapacity Size of the output array in bytes
+         * @return Size of packet, or 0 if the packet cannot fit
          */
-        uint16_t serialize(uint8_t* output);
+        uint16_t serialize(uint8_t* output, size_t outputCapacity);
 };
 
 #define TINY_TRANSFER_PARSER_SEARCHING_FOR_SOH 0
