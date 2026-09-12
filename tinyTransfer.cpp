@@ -230,6 +230,7 @@ bool TinyTransferUpdateParser::processByte(uint8_t byte){
             
             //If checksum of header matches header checksum in the array
             if(redo_checksum == inputPacket.headerChecksum){
+                // Discard packets that exceed the fixed payload or log buffers.
                 if (inputPacket.payloadSize > TINY_TRANSFER_UPDATE_MAX_PAYLOAD_LENGTH ||
                     inputPacket.logSize > TINY_TRANSFER_UPDATE_MAX_LOG_LENGTH) {
                     init();
